@@ -33,11 +33,18 @@ public class WeatherController {
 
     @GetMapping
     public String search(@RequestParam(value = "city") String city,
-                         Model model) {
+                         Model model,
+                         HttpServletRequest httpServletRequest) {
         List<LocationSearchDto> cities = weatherService.findAll(city);
+
+        String sessionIdFromCookies = SessionService.getSessionIdFromCookies(httpServletRequest);
+
+        Optional<CustomSession> customSession = sessionService.findByUUID(sessionIdFromCookies);
+        User user = customSession.get().getUser();
 
         model.addAttribute("cities", cities);
         model.addAttribute("locationSave", new LocationSaveDto());
+        model.addAttribute("user", user);
 
         return "search-results";
     }
@@ -61,6 +68,19 @@ public class WeatherController {
         );
 
         locationDao.save(location);
+
+        return "redirect:/";
+    }
+
+    @DeleteMapping
+    public String deleteLocation(@RequestParam("toDelete") String city,
+                                 HttpServletRequest httpServletRequest) {
+        String sessionIdFromCookies = SessionService.getSessionIdFromCookies(httpServletRequest);
+
+        Optional<CustomSession> customSession = sessionService.findByUUID(sessionIdFromCookies);
+        User user = customSession.get().getUser();
+
+        locationDao.delete(user, city);
 
         return "redirect:/";
     }
