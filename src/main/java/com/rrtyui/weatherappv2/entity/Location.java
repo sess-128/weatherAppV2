@@ -23,6 +23,7 @@ public class Location {
     private String name;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User userId;
 
     private BigDecimal latitude;

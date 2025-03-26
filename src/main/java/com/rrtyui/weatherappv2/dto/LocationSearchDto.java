@@ -19,6 +19,6 @@ public class LocationSearchDto {
     @JsonProperty("country")
     private String country;
 
-    @JsonProperty("state")
+    @JsonProperty("region")
     private String state;
 }

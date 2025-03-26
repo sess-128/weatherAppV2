@@ -3,16 +3,19 @@ package com.rrtyui.weatherappv2.controller;
 import com.rrtyui.weatherappv2.dao.LocationDao;
 import com.rrtyui.weatherappv2.dto.LocationSaveDto;
 import com.rrtyui.weatherappv2.dto.LocationSearchDto;
+import com.rrtyui.weatherappv2.entity.CustomSession;
+import com.rrtyui.weatherappv2.entity.Location;
+import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.service.SessionService;
 import com.rrtyui.weatherappv2.service.WeatherService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/search-results")
@@ -34,8 +37,31 @@ public class WeatherController {
         List<LocationSearchDto> cities = weatherService.findAll(city);
 
         model.addAttribute("cities", cities);
-        model.addAttribute("location", new LocationSaveDto());
+        model.addAttribute("locationSave", new LocationSaveDto());
 
         return "search-results";
+    }
+
+    @PostMapping
+    public String addLocation(@ModelAttribute("locationSave") LocationSaveDto locationSaveDto,
+                              HttpServletRequest httpServletRequest) {
+        String sessionIdFromCookies = SessionService.getSessionIdFromCookies(httpServletRequest);
+
+        Optional<CustomSession> customSession = sessionService.findByUUID(sessionIdFromCookies);
+        User user = customSession.get().getUser();
+
+        locationSaveDto.setUserId(user);
+
+        Location location = new Location(
+                null,
+                locationSaveDto.getName(),
+                user,
+                locationSaveDto.getLatitude(),
+                locationSaveDto.getLongitude()
+        );
+
+        locationDao.save(location);
+
+        return "redirect:/";
     }
 }

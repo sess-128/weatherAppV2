@@ -45,19 +45,22 @@
                 <div th:each="local : ${cities}" class="col-12 col-lg-3 col-md-6 mb-4">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
-                            <form th:method="GET" th:action="@{/search-results}" th:object="${location}">
+                            <form th:method="POSt" th:action="@{/search-results}" th:object="${locationSave}">
+
+                                <input type="hidden" name="name" th:value="${local.getCity()}">
+                                <input type="hidden" name="latitude" th:value="${local.getLatitude()}">
+                                <input type="hidden" name="longitude" th:value="${local.getLongitude()}">
+
                                 <h5 th:field="*{name}" th:text="${local.getCity()}" class="card-title">San
                                     Francisco</h5>
-                                <p th:field="*{latitude}" th:text="${local.getLatitude()}" class="card-text mb-1">
+                                <p th:field="*{latitude}" th:text="'Latitude: ' + ${local.getLatitude()}" class="card-text mb-1">
                                     Latitude: 37.7790262</p>
-                                <p th:field="*{longitude}" th:text="${local.getLongitude()}" class="card-text mb-1">
+                                <p th:field="*{longitude}" th:text="'Longitude: ' + ${local.getLongitude()}" class="card-text mb-1">
                                     Longitude: -122.419906</p>
-                                <p th:text="${local.getCountry()}" class="card-text mb-1">Country: US</p>
-                                <p th:text="${local.getState()}" class="card-text mb-3">State: California</p>
+                                <p th:text="'Country: ' + ${local.getCountry()}" class="card-text mb-1">Country: US</p>
+                                <p th:text="'State: ' + ${local.getState()}" class="card-text mb-3">State: California</p>
                                 <div class="mt-auto">
-                                    <a th:href="@{/search-results}">
-                                        <button class="btn btn-primary w-100" type="submit">Add</button>
-                                    </a>
+                                    <button class="btn btn-primary w-100" type="submit">Add</button>
                                 </div>
                             </form>
                         </div>

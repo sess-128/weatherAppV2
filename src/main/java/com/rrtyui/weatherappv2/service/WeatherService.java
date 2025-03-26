@@ -20,10 +20,9 @@ public class WeatherService {
 
     public List<LocationSearchDto> findAll(String city) {
         String url = UriComponentsBuilder
-                .fromHttpUrl("https://api.openweathermap.org/geo/1.0/direct?")
+                .fromHttpUrl("http://api.weatherapi.com/v1/search.json")
                 .queryParam("q", city)
-                .queryParam("limit", 5)
-                .queryParam("appid", "c868cca3f789b0d16792b9b8db92507c")
+                .queryParam("key", "e6ff48a146ab46a9a77133427252603")
                 .toUriString();
 
         ResponseEntity<LocationSearchDto[]> response = restTemplate.getForEntity(url, LocationSearchDto[].class);
