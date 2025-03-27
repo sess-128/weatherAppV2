@@ -1,4 +1,4 @@
-package com.rrtyui.weatherappv2.dto;
+package com.rrtyui.weatherappv2.dto.location;
 
 import com.rrtyui.weatherappv2.entity.User;
 import lombok.Data;

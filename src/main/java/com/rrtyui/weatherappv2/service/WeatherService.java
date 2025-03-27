@@ -4,10 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rrtyui.weatherappv2.dao.LocationDao;
-import com.rrtyui.weatherappv2.dto.LocationSaveDto;
-import com.rrtyui.weatherappv2.dto.LocationSearchDto;
-import com.rrtyui.weatherappv2.dto.LocationShowDto;
-import com.rrtyui.weatherappv2.dto.tees.Wwa;
+import com.rrtyui.weatherappv2.dto.location.LocationSearchDto;
+import com.rrtyui.weatherappv2.dto.location.LocationShowDto;
+import com.rrtyui.weatherappv2.dto.location.LocationByCoordinatesJson;
 import com.rrtyui.weatherappv2.entity.Location;
 import com.rrtyui.weatherappv2.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -61,16 +59,16 @@ public class WeatherService {
             String latNlon = location.getLatitude().toString() + "," + location.getLongitude().toString();
             String replaced = url.replace("shouldBeReplaced", latNlon);
             String json = restTemplate.getForObject(replaced, String.class);
-            Wwa wwa = objectMapper.readValue(json, Wwa.class);
+            LocationByCoordinatesJson locationByCoordinatesJson = objectMapper.readValue(json, LocationByCoordinatesJson.class);
 
             LocationShowDto locationShowDto = new LocationShowDto(
-                    wwa.getCurrent().getTemp_c(),
-                    wwa.getCurrent().getFeelslike_c(),
-                    wwa.getLocation().getName(),
-                    wwa.getLocation().getCountry(),
-                    wwa.getCurrent().getCondition().getText(),
-                    wwa.getCurrent().getHumidity(),
-                    wwa.getCurrent().getCondition().getIcon()
+                    locationByCoordinatesJson.getCurrent().getTemp_c(),
+                    locationByCoordinatesJson.getCurrent().getFeelslike_c(),
+                    locationByCoordinatesJson.getLocation().getName(),
+                    locationByCoordinatesJson.getLocation().getCountry(),
+                    locationByCoordinatesJson.getCurrent().getCondition().getText(),
+                    locationByCoordinatesJson.getCurrent().getHumidity(),
+                    locationByCoordinatesJson.getCurrent().getCondition().getIcon()
             );
 
             locationForShow.add(locationShowDto);

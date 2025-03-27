@@ -1,4 +1,4 @@
-package com.rrtyui.weatherappv2.dto.tees;
+package com.rrtyui.weatherappv2.dto.location;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Wwa {
+public class LocationByCoordinatesJson {
     private Location location;
     private Current current;
 

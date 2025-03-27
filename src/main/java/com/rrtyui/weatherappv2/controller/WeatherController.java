@@ -1,8 +1,8 @@
 package com.rrtyui.weatherappv2.controller;
 
 import com.rrtyui.weatherappv2.dao.LocationDao;
-import com.rrtyui.weatherappv2.dto.LocationSaveDto;
-import com.rrtyui.weatherappv2.dto.LocationSearchDto;
+import com.rrtyui.weatherappv2.dto.location.LocationSaveDto;
+import com.rrtyui.weatherappv2.dto.location.LocationSearchDto;
 import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.Location;
 import com.rrtyui.weatherappv2.entity.User;

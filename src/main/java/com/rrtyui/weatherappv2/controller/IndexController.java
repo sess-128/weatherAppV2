@@ -1,8 +1,8 @@
 package com.rrtyui.weatherappv2.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.rrtyui.weatherappv2.dto.LocationSearchDto;
-import com.rrtyui.weatherappv2.dto.LocationShowDto;
+import com.rrtyui.weatherappv2.dto.location.LocationSearchDto;
+import com.rrtyui.weatherappv2.dto.location.LocationShowDto;
 import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.service.CookieService;

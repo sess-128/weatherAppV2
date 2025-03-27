@@ -1,4 +1,4 @@
-package com.rrtyui.weatherappv2.dto;
+package com.rrtyui.weatherappv2.dto.location;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
