@@ -31,8 +31,8 @@
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
                     <div class="input-group has-validation">
-                        <input th:field="*{login}" type="text" class="form-control" id="username" name="username" required/>
-                        <div th:if="${#fields.hasErrors('login')}" th:errors="*{login}" class="invalid-feedback">
+                        <input th:field="*{name}" type="text" class="form-control" id="username" name="username" required/>
+                        <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="invalid-feedback">
                             Account with this email already exists.
                         </div>
                     </div>

@@ -16,7 +16,7 @@ public abstract class BaseDao<T> {
     }
 
     @Transactional
-    public T save (T entity) {
+    public T save(T entity) {
         Session session = sessionFactory.getCurrentSession();
         session.persist(entity);
 

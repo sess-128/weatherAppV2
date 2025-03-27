@@ -5,8 +5,7 @@ import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.service.CookieService;
 import com.rrtyui.weatherappv2.service.SessionService;
 import com.rrtyui.weatherappv2.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.rrtyui.weatherappv2.util.UserPasswordDecodeEncodeUtil;
 import jakarta.validation.Valid;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +56,7 @@ public class SignInController {
 
         User savedUser = savedUserOpt.get();
 
-        if (!BCrypt.checkpw(user.getPassword(), savedUser.getPassword())) {
+        if (UserPasswordDecodeEncodeUtil.isCorrectPassword(user.getPassword(), savedUser.getPassword())) {
             model.addAttribute("wrongCredentials", "Wrong password or login.");
             return "sign-in";
         }

@@ -1,11 +1,13 @@
 package com.rrtyui.weatherappv2.dto.location;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
+@Builder
 public class LocationShowDto {
 
     @JsonProperty("temp_c")

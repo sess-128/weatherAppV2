@@ -3,7 +3,6 @@ package com.rrtyui.weatherappv2.dao;
 import com.rrtyui.weatherappv2.entity.Location;
 import com.rrtyui.weatherappv2.entity.User;
 import jakarta.transaction.Transactional;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Component;
 

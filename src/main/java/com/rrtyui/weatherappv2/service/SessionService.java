@@ -3,6 +3,8 @@ package com.rrtyui.weatherappv2.service;
 import com.rrtyui.weatherappv2.dao.CustomSessionDao;
 import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
+import com.rrtyui.weatherappv2.exception.InvalidSessionException;
+import com.rrtyui.weatherappv2.util.mapper.MapperToCustomSession;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,28 +18,36 @@ import java.util.UUID;
 @Service
 public class SessionService {
     private final CustomSessionDao customSessionDao;
+    private final HttpServletRequest httpServletRequest;
+    private final MapperToCustomSession mapperToCustomSession;
 
     @Autowired
-    public SessionService(CustomSessionDao customSessionDao) {
+    public SessionService(CustomSessionDao customSessionDao, HttpServletRequest httpServletRequest, MapperToCustomSession mapperToCustomSession) {
         this.customSessionDao = customSessionDao;
+        this.httpServletRequest = httpServletRequest;
+        this.mapperToCustomSession = mapperToCustomSession;
     }
 
     public CustomSession add(User user) {
-        CustomSession customSession = CustomSession.builder()
-                .id(UUID.randomUUID())
-                .user(user)
-                .expiresAt(LocalDateTime.now().plusHours(1))
-                .build();
-
+        CustomSession customSession = mapperToCustomSession.mapFrom(user);
         return customSessionDao.save(customSession);
     }
 
+    public User getCurrentUser() {
+        String sessionUuid = getSessionUuidFromCookies(httpServletRequest);
+        Optional<CustomSession> customSession = findByUUID(sessionUuid);
+        if (customSession.isEmpty()) {
+            throw new InvalidSessionException("Invalid session: sign in again");
+        }
+        return customSession.get().getUser();
+    }
+
     public Optional<CustomSession> findByUUID(String uuid) {
-        deleteOldSessions();
+        deleteInvalidSessions();
         return customSessionDao.findById(uuid);
     }
 
-    public static String getSessionIdFromCookies(HttpServletRequest request) {
+    public static String getSessionUuidFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -49,7 +59,7 @@ public class SessionService {
         return null;
     }
 
-    public void deleteOldSessions() {
+    public void deleteInvalidSessions() {
         List<CustomSession> customSessions = customSessionDao.findAll();
         for (CustomSession customSession : customSessions) {
             if (isValidTimeEnded(customSession.getExpiresAt())) {
@@ -58,7 +68,7 @@ public class SessionService {
         }
     }
 
-    private boolean isValidTimeEnded (LocalDateTime timeToCheck) {
+    private boolean isValidTimeEnded(LocalDateTime timeToCheck) {
         return LocalDateTime.now().isAfter(timeToCheck);
     }
 }

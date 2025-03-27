@@ -1,5 +1,6 @@
 package com.rrtyui.weatherappv2.controller;
 
+import com.rrtyui.weatherappv2.dto.user.UserSaveDto;
 import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.service.CookieService;
@@ -28,31 +29,30 @@ public class SignUpController {
 
     @GetMapping
     public String mainPage(Model model) {
-        model.addAttribute("user", new User());
+        model.addAttribute("user", new UserSaveDto());
         return "sign-up";
     }
 
     @PostMapping
-    public String signUp(@ModelAttribute("user") @Valid User user,
+    public String signUp(@ModelAttribute("user") @Valid UserSaveDto userSaveDto,
                          BindingResult bindingResult,
                          @RequestParam("repeatPassword") String repeatPassword,
                          Model model) {
-
-        if (!user.getPassword().equals(repeatPassword)) {
-            model.addAttribute("passwordMismatchError", "Passwords do not match.");
-            return "sign-up";
-        }
         if (bindingResult.hasErrors()) {
             return "sign-up";
         }
+        if (!userSaveDto.getPassword().equals(repeatPassword)) {
+            model.addAttribute("passwordMismatchError", "Passwords do not match.");
+            return "sign-up";
+        }
 
-        User savedUser = userService.addUser(user);
+        User user = userService.addUser(userSaveDto);
 
-        CustomSession customSession = sessionService.add(savedUser);
+        CustomSession customSession = sessionService.add(user);
 
         cookieService.addSessionToCookie(customSession);
 
-        model.addAttribute(user);
+        model.addAttribute(userSaveDto);
         return "redirect:/";
     }
 }
