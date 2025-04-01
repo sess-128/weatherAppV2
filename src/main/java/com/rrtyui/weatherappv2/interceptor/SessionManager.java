@@ -1,7 +1,6 @@
 package com.rrtyui.weatherappv2.interceptor;
 
 import com.rrtyui.weatherappv2.entity.CustomSession;
-import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.service.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

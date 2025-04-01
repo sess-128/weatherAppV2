@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class SessionService {
@@ -37,7 +36,7 @@ public class SessionService {
         String sessionUuid = getSessionUuidFromCookies(httpServletRequest);
         Optional<CustomSession> customSession = findByUUID(sessionUuid);
         if (customSession.isEmpty()) {
-            throw new InvalidSessionException("Invalid session: sign in again");
+            throw new InvalidSessionException("Invalid session: sign in / sign up");
         }
         return customSession.get().getUser();
     }
@@ -45,6 +44,16 @@ public class SessionService {
     public Optional<CustomSession> findByUUID(String uuid) {
         deleteInvalidSessions();
         return customSessionDao.findById(uuid);
+    }
+
+    public void deleteInvalidSessions() {
+        List<CustomSession> customSessions = customSessionDao.findAll();
+        for (CustomSession customSession : customSessions) {
+            if (isValidTimeEnded(customSession.getExpiresAt())) {
+                customSession.setUser(null);
+                customSessionDao.delete(customSession);
+            }
+        }
     }
 
     public static String getSessionUuidFromCookies(HttpServletRequest request) {
@@ -59,16 +68,9 @@ public class SessionService {
         return null;
     }
 
-    public void deleteInvalidSessions() {
-        List<CustomSession> customSessions = customSessionDao.findAll();
-        for (CustomSession customSession : customSessions) {
-            if (isValidTimeEnded(customSession.getExpiresAt())) {
-                customSessionDao.delete(customSession);
-            }
-        }
-    }
-
     private boolean isValidTimeEnded(LocalDateTime timeToCheck) {
         return LocalDateTime.now().isAfter(timeToCheck);
     }
 }
+
+//TODO: при удалении сессии удаляется и пользователь -> настроить каскадное удаление

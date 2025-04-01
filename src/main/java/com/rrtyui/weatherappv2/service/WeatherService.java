@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rrtyui.weatherappv2.dao.LocationDao;
 import com.rrtyui.weatherappv2.dto.location.LocationByCoordinatesJson;
+import com.rrtyui.weatherappv2.dto.location.LocationSaveDto;
 import com.rrtyui.weatherappv2.dto.location.LocationSearchDto;
 import com.rrtyui.weatherappv2.dto.location.LocationShowDto;
 import com.rrtyui.weatherappv2.entity.Location;
 import com.rrtyui.weatherappv2.entity.User;
+import com.rrtyui.weatherappv2.util.mapper.MapperToLocation;
 import com.rrtyui.weatherappv2.util.mapper.MapperToLocationShowDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,16 +28,18 @@ public class WeatherService {
     private final RestTemplate restTemplate;
     private final LocationDao locationDao;
     private final ObjectMapper objectMapper;
+    private final MapperToLocation mapperToLocation;
     private final MapperToLocationShowDto mapperToLocationShowDto;
 
     @Value("${api.key}")
     private String API_KEY;
 
     @Autowired
-    public WeatherService(RestTemplate restTemplate, LocationDao locationDao, ObjectMapper objectMapper, MapperToLocationShowDto mapperToLocationShowDto) {
+    public WeatherService(RestTemplate restTemplate, LocationDao locationDao, ObjectMapper objectMapper, MapperToLocation mapperToLocation, MapperToLocationShowDto mapperToLocationShowDto) {
         this.restTemplate = restTemplate;
         this.locationDao = locationDao;
         this.objectMapper = objectMapper;
+        this.mapperToLocation = mapperToLocation;
         this.mapperToLocationShowDto = mapperToLocationShowDto;
     }
 
@@ -53,7 +57,7 @@ public class WeatherService {
         return List.of(body);
     }
 
-    public List<LocationShowDto> getLocationsForUser(User user) throws JsonProcessingException {
+    public List<LocationShowDto> getLocationsForShow(User user) throws JsonProcessingException {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         List<LocationShowDto> locationForShow = new ArrayList<>();
         List<Location> locationsForUser = locationDao.getLocationsForUser(user);
@@ -65,6 +69,12 @@ public class WeatherService {
                 .toUriString();
 
 
+        fillLocationsForShow(locationsForUser, url, locationForShow);
+
+        return locationForShow;
+    }
+
+    private void fillLocationsForShow(List<Location> locationsForUser, String url, List<LocationShowDto> locationForShow) throws JsonProcessingException {
         for (Location location : locationsForUser) {
             String latNlon = location.getLatitude().toString() + "," + location.getLongitude().toString();
             String replaced = url.replace(TO_REPLACE, latNlon);
@@ -75,11 +85,11 @@ public class WeatherService {
 
             locationForShow.add(locationShowDto);
         }
-
-        return locationForShow;
     }
 
-    public void saveLocation(Location location) {
+    public void saveLocationForCurrentUser(LocationSaveDto locationSaveDto, User user) {
+        Location location = mapperToLocation.mapFrom(locationSaveDto);
+        location.setUser(user);
         locationDao.save(location);
     }
 

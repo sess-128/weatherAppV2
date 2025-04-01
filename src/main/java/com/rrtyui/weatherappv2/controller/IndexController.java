@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.rrtyui.weatherappv2.dto.location.LocationSearchDto;
 import com.rrtyui.weatherappv2.dto.location.LocationShowDto;
 import com.rrtyui.weatherappv2.entity.User;
-import com.rrtyui.weatherappv2.service.CookieService;
-import com.rrtyui.weatherappv2.service.SessionService;
-import com.rrtyui.weatherappv2.service.UserService;
+import com.rrtyui.weatherappv2.service.AuthService;
 import com.rrtyui.weatherappv2.service.WeatherService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,14 +16,14 @@ import java.util.List;
 @Controller
 @RequestMapping("/")
 public class IndexController extends BaseController {
-    public IndexController(UserService userService, SessionService sessionService, CookieService cookieService, WeatherService weatherService) {
-        super(userService, sessionService, cookieService, weatherService);
+    protected IndexController(AuthService authService, WeatherService weatherService) {
+        super(authService, weatherService);
     }
 
     @GetMapping
     public String index(Model model) throws JsonProcessingException {
-        User user = sessionService.getCurrentUser();
-        List<LocationShowDto> locationsForShow = weatherService.getLocationsForUser(user);
+        User user = authService.getCurrentUser();
+        List<LocationShowDto> locationsForShow = weatherService.getLocationsForShow(user);
 
         model.addAttribute("user", user);
         model.addAttribute("city", new LocationSearchDto());
@@ -36,7 +34,7 @@ public class IndexController extends BaseController {
 
     @GetMapping("/logout")
     public String logout() {
-        cookieService.delete();
+        authService.logout();
         return "redirect:/";
     }
 }

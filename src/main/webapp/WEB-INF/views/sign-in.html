@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"> <!-- Добавлено пространство имен Thymeleaf -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Weather Viewer – Sign In</title>
@@ -17,6 +17,13 @@
 
     <h2 class="text-center mb-5">Sign In</h2>
 
+    <div th:if="${valid != null}" class="row justify-content-center">
+        <div class="col-12 col-lg-4 col-md-6 col-sm-12">
+            <div class="alert alert-danger" role="alert">
+                <span th:text="${valid.getFieldError().getDefaultMessage()}">Типо наша валидация</span>
+            </div>
+        </div>
+    </div>
     <div th:if="${wrongCredentials != null}" class="row justify-content-center">
         <div class="col-12 col-lg-4 col-md-6 col-sm-12">
             <div class="alert alert-danger" role="alert">
