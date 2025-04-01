@@ -13,10 +13,10 @@ import java.util.Optional;
 
 @Service
 public class AuthService {
+    private static final String WRONG_CREDENTIALS = "Wrong password or login.";
     private final UserService userService;
     private final SessionService sessionService;
     private final CookieService cookieService;
-    private static final String WRONG_CREDENTIALS = "Wrong password or login.";
 
     @Autowired
     public AuthService(UserService userService, SessionService sessionService, CookieService cookieService) {
@@ -35,7 +35,7 @@ public class AuthService {
         User user = savedUserOpt.get();
 
         if (!UserPasswordDecodeEncodeUtil.isCorrectPassword(userLoginDto.getPassword(), user.getPassword())) {
-            return AuthResult.failure("Wrong password or login.");
+            return AuthResult.failure(WRONG_CREDENTIALS);
         }
 
         CustomSession customSession = sessionService.add(user);

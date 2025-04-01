@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/sign-up")
-public class SignUpController extends BaseController{
+public class SignUpController extends BaseController {
     protected SignUpController(AuthService authService, WeatherService weatherService) {
         super(authService, weatherService);
     }

@@ -19,14 +19,13 @@ public abstract class BaseDao<T> {
     @Transactional
     public T save(T entity) {
         try {
-
             Session session = sessionFactory.getCurrentSession();
             session.persist(entity);
 
             return entity;
-        }catch (RuntimeException e) {
-        throw new UserAlreadyExistException(e.getMessage());
-    }
+        } catch (RuntimeException e) {
+            throw new UserAlreadyExistException(e.getMessage());
+        }
     }
 
     @Transactional

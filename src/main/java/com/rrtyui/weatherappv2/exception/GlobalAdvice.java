@@ -3,7 +3,6 @@ package com.rrtyui.weatherappv2.exception;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -23,12 +22,12 @@ public class GlobalAdvice {
         model.addAttribute("errorTitle", "Wrong credentials, please try again");
         model.addAttribute("errorDetails", "Wrong credentials, please try again or sign up as new user. Sorry for landing on this page");
         return "error";
-
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public String handleInvalidCityName(Model model) {
-        return "sign-in";
+    @ExceptionHandler(ThirdPartyServiceException.class)
+    public String handleAPIErrors(Model model) {
+        model.addAttribute("errorTitle", "External service error");
+        model.addAttribute("errorDetails", "We will try our best to speed up the resolution of problems on the external service side.");
+        return "error";
     }
-    // TODO: метод для отловли ошибки при невалидном названии города в строке поиска
 }

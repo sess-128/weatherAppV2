@@ -11,10 +11,10 @@
 <nav class="navbar navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
-            <img src="/resources/images/weather-app.png" alt="Weather icon" width="30" height="24">Weather Tracker
+            <img alt="Weather icon" height="24" src="/resources/images/weather-app.png" width="30">Weather Tracker
         </a>
         <div class="d-flex align-items-center">
-            <span th:text="${user.getName()}" class="navbar-text me-3">zhukovsd</span>
+            <span class="navbar-text me-3" th:text="${user.getName()}">zhukovsd</span>
             <a th:href="@{/logout}">
                 <button class="btn btn-outline-danger">Sign out</button>
             </a>
@@ -24,12 +24,11 @@
 <section id="page-content">
     <div class="container mt-4">
         <div class="d-flex my-4" style="flex-direction: column">
-            <form th:method="GET" th:action="@{/search-results}">
+            <form th:action="@{/search-results}" th:method="GET" th:object="${search}">
                 <div class="input-group location-search-input-group me-3">
-
-                    <input class="form-control" type="text" name="city" placeholder="Enter location" required>
-                    <button class="btn btn-outline-secondary btn-sm clear-input-button" type="button"
-                            onclick="this.previousElementSibling.value=''">
+                    <input class="form-control" placeholder="Enter location" required th:field="*{city}" type="text">
+                    <button class="btn btn-outline-secondary btn-sm clear-input-button" onclick="this.previousElementSibling.value=''"
+                            type="button">
                         &times;
                     </button>
                     <button class="btn btn-outline-success" type="submit">Search</button>
@@ -41,25 +40,25 @@
 
         <div>
             <div class="row">
-                <div th:each="loc_f_s : ${locations_for_show}" class="col-12 col-lg-3 col-md-6 mb-4">
+                <div class="col-12 col-lg-3 col-md-6 mb-4" th:each="loc_f_s : ${locations_for_show}">
                     <div class="card h-100 position-relative weather-card">
                         <div class="position-absolute weather-card-delete-form">
-                            <form th:method="DELETE" th:action="@{/search-results}">
-                                <input type="hidden" name="toDelete" th:value="${loc_f_s.city}">
-                                <button class="btn-close" aria-label="Delete" type="submit"></button>
+                            <form th:action="@{/search-results}" th:method="DELETE">
+                                <input name="toDelete" th:value="${loc_f_s.city}" type="hidden">
+                                <button aria-label="Delete" class="btn-close" type="submit"></button>
                             </form>
                         </div>
-                        <img class="card-img-top img-fluid"
-                             th:src="'https:' + ${loc_f_s.icon}"
-                             alt="Weather icon">
+                        <img alt="Weather icon"
+                             class="card-img-top img-fluid"
+                             th:src="'https:' + ${loc_f_s.icon}">
                         <div class="card-body d-flex flex-column">
-                            <h1 th:text="${loc_f_s.currentTemp} + ' °C'" class="card-text">7°C</h1>
-                            <h3 th:text="${loc_f_s.city} + ', ' + ${loc_f_s.country}" class="card-title">Tbilisi,
+                            <h1 class="card-text" th:text="${loc_f_s.currentTemp} + ' °C'">7°C</h1>
+                            <h3 class="card-title" th:text="${loc_f_s.city} + ', ' + ${loc_f_s.country}">Tbilisi,
                                 GE</h3>
                             <p class="card-text mb-1">Feels like <span th:text="${loc_f_s.feelsLike} + ' °C'">2</span>
                                 <span th:text="${loc_f_s.skyState}">Clear sky</span>
                             </p>
-                            <p th:text="'Humidity: ' + ${loc_f_s.humidity} +'%'" class="card-text mb-1">Humidity:
+                            <p class="card-text mb-1" th:text="'Humidity: ' + ${loc_f_s.humidity} +'%'">Humidity:
                                 70%</p>
                         </div>
                     </div>

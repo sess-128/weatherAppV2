@@ -18,7 +18,6 @@ public class UserDao extends BaseDao<User> {
     @Transactional
     public Optional<User> findByLogin(User user) {
         try {
-
             User foundUser = (User) sessionFactory.getCurrentSession()
                     .createQuery("FROM User WHERE name = :login")
                     .setParameter("login", user.getName())

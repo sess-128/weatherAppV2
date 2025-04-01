@@ -6,7 +6,8 @@ public class UserPasswordDecodeEncodeUtil {
     public static String encodePassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
-    public static boolean isCorrectPassword (String source, String target) {
+
+    public static boolean isCorrectPassword(String source, String target) {
         String encodePassword = encodePassword(source);
         return !BCrypt.checkpw(encodePassword, target);
     }

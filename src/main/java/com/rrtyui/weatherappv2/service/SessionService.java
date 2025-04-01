@@ -27,6 +27,18 @@ public class SessionService {
         this.mapperToCustomSession = mapperToCustomSession;
     }
 
+    public static String getSessionUuidFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("session_id".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     public CustomSession add(User user) {
         CustomSession customSession = mapperToCustomSession.mapFrom(user);
         return customSessionDao.save(customSession);
@@ -56,21 +68,7 @@ public class SessionService {
         }
     }
 
-    public static String getSessionUuidFromCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("session_id".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
-
     private boolean isValidTimeEnded(LocalDateTime timeToCheck) {
         return LocalDateTime.now().isAfter(timeToCheck);
     }
 }
-
-//TODO: при удалении сессии удаляется и пользователь -> настроить каскадное удаление

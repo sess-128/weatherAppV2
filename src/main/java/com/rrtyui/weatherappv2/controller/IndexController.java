@@ -1,7 +1,6 @@
 package com.rrtyui.weatherappv2.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.rrtyui.weatherappv2.dto.location.LocationSearchDto;
+import com.rrtyui.weatherappv2.dto.location.LocationNameDto;
 import com.rrtyui.weatherappv2.dto.location.LocationShowDto;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.service.AuthService;
@@ -21,12 +20,12 @@ public class IndexController extends BaseController {
     }
 
     @GetMapping
-    public String index(Model model) throws JsonProcessingException {
+    public String index(Model model) {
         User user = authService.getCurrentUser();
         List<LocationShowDto> locationsForShow = weatherService.getLocationsForShow(user);
 
         model.addAttribute("user", user);
-        model.addAttribute("city", new LocationSearchDto());
+        model.addAttribute("search", new LocationNameDto());
         model.addAttribute("locations_for_show", locationsForShow);
 
         return "index";

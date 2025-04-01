@@ -1,37 +1,44 @@
 package com.rrtyui.weatherappv2.controller;
 
+import com.rrtyui.weatherappv2.dto.location.LocationNameDto;
 import com.rrtyui.weatherappv2.dto.location.LocationSaveDto;
 import com.rrtyui.weatherappv2.dto.location.LocationSearchDto;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.service.AuthService;
 import com.rrtyui.weatherappv2.service.WeatherService;
-import com.rrtyui.weatherappv2.util.mapper.MapperToLocation;
-import jakarta.validation.constraints.Size;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @Controller
 @RequestMapping("/search-results")
-public class WeatherController extends BaseController{
+public class WeatherController extends BaseController {
     protected WeatherController(AuthService authService, WeatherService weatherService) {
         super(authService, weatherService);
     }
 
     @GetMapping
-    public String search(@RequestParam(value = "city")
-                             @Size(min = 3, max = 20) String city,
+    public String search(@ModelAttribute("search") @Valid LocationNameDto locationNameDto,
+                         BindingResult bindingResult,
                          Model model) {
-        List<LocationSearchDto> cities = weatherService.findAll(city);
-
         User user = authService.getCurrentUser();
+        model.addAttribute("user", user);
 
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("valid", bindingResult);
+            model.addAttribute("cities", Collections.emptyList());
+            model.addAttribute("locationSave", new LocationSaveDto());
+            return "search-results";
+        }
+
+        List<LocationSearchDto> cities = weatherService.findAll(locationNameDto);
         model.addAttribute("cities", cities);
         model.addAttribute("locationSave", new LocationSaveDto());
-        model.addAttribute("user", user);
 
         return "search-results";
     }
@@ -39,7 +46,6 @@ public class WeatherController extends BaseController{
     @PostMapping
     public String addLocation(@ModelAttribute("locationSave") LocationSaveDto locationSaveDto) {
         User user = authService.getCurrentUser();
-
         weatherService.saveLocationForCurrentUser(locationSaveDto, user);
 
         return "redirect:/";

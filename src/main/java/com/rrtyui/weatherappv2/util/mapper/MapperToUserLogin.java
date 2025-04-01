@@ -6,7 +6,7 @@ import com.rrtyui.weatherappv2.util.UserPasswordDecodeEncodeUtil;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MapperToUserLogin implements Mapper<UserLoginDto, User>{
+public class MapperToUserLogin implements Mapper<UserLoginDto, User> {
     @Override
     public User mapFrom(UserLoginDto object) {
         return User.builder()

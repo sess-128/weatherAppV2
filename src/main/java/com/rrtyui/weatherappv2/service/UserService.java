@@ -25,8 +25,8 @@ public class UserService {
     }
 
     public User addUser(UserSaveDto userSaveDto) {
-            User user = mapperToUserSave.mapFrom(userSaveDto);
-            return userDao.save(user);
+        User user = mapperToUserSave.mapFrom(userSaveDto);
+        return userDao.save(user);
     }
 
     public Optional<User> findByLogin(UserLoginDto userLoginDto) {
