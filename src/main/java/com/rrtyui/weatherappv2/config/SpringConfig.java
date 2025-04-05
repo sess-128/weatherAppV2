@@ -2,7 +2,7 @@ package com.rrtyui.weatherappv2.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rrtyui.weatherappv2.interceptor.SessionManager;
-import com.rrtyui.weatherappv2.service.SessionService;
+import com.rrtyui.weatherappv2.service.CookieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -20,12 +20,10 @@ import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 @ComponentScan("com.rrtyui.weatherappv2")
 public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
-    private final SessionService sessionService;
 
     @Autowired
-    public SpringConfig(ApplicationContext applicationContext, SessionService sessionService) {
+    public SpringConfig(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
-        this.sessionService = sessionService;
     }
 
     @Bean
@@ -55,15 +53,15 @@ public class SpringConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    SessionManager getSessionManager() {
-        return new SessionManager(sessionService);
+    public SessionManager sessionManager(CookieService cookieService) {
+        return new SessionManager(cookieService);
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(getSessionManager())
+        registry.addInterceptor(sessionManager(null))
                 .addPathPatterns("/**")
-                .excludePathPatterns("/resources/**", "/sign-up", "sign-in");
+                .excludePathPatterns("/resources/**", "/sign-up", "/sign-in");
     }
 
     @Bean

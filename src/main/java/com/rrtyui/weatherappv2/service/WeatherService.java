@@ -26,19 +26,15 @@ public class WeatherService {
     private final RestTemplate restTemplate;
     private final LocationDao locationDao;
     private final ObjectMapper objectMapper;
-    private final MapperToLocation mapperToLocation;
-    private final MapperToLocationShowDto mapperToLocationShowDto;
 
     @Value("${api.key}")
     private String API_KEY;
 
     @Autowired
-    public WeatherService(RestTemplate restTemplate, LocationDao locationDao, ObjectMapper objectMapper, MapperToLocation mapperToLocation, MapperToLocationShowDto mapperToLocationShowDto) {
+    public WeatherService(RestTemplate restTemplate, LocationDao locationDao, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.locationDao = locationDao;
         this.objectMapper = objectMapper;
-        this.mapperToLocation = mapperToLocation;
-        this.mapperToLocationShowDto = mapperToLocationShowDto;
     }
 
     public List<LocationSearchDto> findAll(LocationNameDto LocationNameDto) {
@@ -79,7 +75,7 @@ public class WeatherService {
             String json = restTemplate.getForObject(replaced, String.class);
             try {
                 LocationByCoordinatesJson locationByCoordinatesJson = objectMapper.readValue(json, LocationByCoordinatesJson.class);
-                LocationShowDto locationShowDto = mapperToLocationShowDto.mapFrom(locationByCoordinatesJson);
+                LocationShowDto locationShowDto = MapperToLocationShowDto.mapFrom(locationByCoordinatesJson);
 
                 locationForShow.add(locationShowDto);
             } catch (JsonProcessingException e) {
@@ -89,7 +85,7 @@ public class WeatherService {
     }
 
     public void saveLocationForCurrentUser(LocationSaveDto locationSaveDto, User user) {
-        Location location = mapperToLocation.mapFrom(locationSaveDto);
+        Location location = MapperToLocation.mapFrom(locationSaveDto);
         location.setUser(user);
         locationDao.save(location);
     }

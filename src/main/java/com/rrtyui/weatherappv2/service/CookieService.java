@@ -4,6 +4,7 @@ import com.rrtyui.weatherappv2.entity.CustomSession;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,6 +12,7 @@ public class CookieService {
     private final HttpServletRequest httpServletRequest;
     private final HttpServletResponse httpServletResponse;
 
+    @Autowired
     public CookieService(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         this.httpServletRequest = httpServletRequest;
         this.httpServletResponse = httpServletResponse;
@@ -30,5 +32,17 @@ public class CookieService {
                 httpServletResponse.addCookie(cookie);
             }
         }
+    }
+
+    public String getSessionId(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("session_id".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 }

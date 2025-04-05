@@ -5,8 +5,6 @@ import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.exception.InvalidSessionException;
 import com.rrtyui.weatherappv2.util.mapper.MapperToCustomSession;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,35 +15,20 @@ import java.util.Optional;
 @Service
 public class SessionService {
     private final CustomSessionDao customSessionDao;
-    private final HttpServletRequest httpServletRequest;
-    private final MapperToCustomSession mapperToCustomSession;
+    private final CookieService cookieService;
 
     @Autowired
-    public SessionService(CustomSessionDao customSessionDao, HttpServletRequest httpServletRequest, MapperToCustomSession mapperToCustomSession) {
+    public SessionService(CustomSessionDao customSessionDao, CookieService cookieService) {
         this.customSessionDao = customSessionDao;
-        this.httpServletRequest = httpServletRequest;
-        this.mapperToCustomSession = mapperToCustomSession;
-    }
-
-    public static String getSessionUuidFromCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("session_id".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
+        this.cookieService = cookieService;
     }
 
     public CustomSession add(User user) {
-        CustomSession customSession = mapperToCustomSession.mapFrom(user);
+        CustomSession customSession = MapperToCustomSession.mapFrom(user);
         return customSessionDao.save(customSession);
     }
 
-    public User getCurrentUser() {
-        String sessionUuid = getSessionUuidFromCookies(httpServletRequest);
+    public User getCurrentUser(String sessionUuid) {
         Optional<CustomSession> customSession = findByUUID(sessionUuid);
         if (customSession.isEmpty()) {
             throw new InvalidSessionException("Invalid session: sign in / sign up");

@@ -1,19 +1,17 @@
 package com.rrtyui.weatherappv2.interceptor;
 
-import com.rrtyui.weatherappv2.entity.CustomSession;
-import com.rrtyui.weatherappv2.service.SessionService;
+import com.rrtyui.weatherappv2.service.CookieService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.Optional;
-
+@Component
 public class SessionManager implements HandlerInterceptor {
+    private final CookieService cookieService;
 
-    private final SessionService sessionService;
-
-    public SessionManager(SessionService sessionService) {
-        this.sessionService = sessionService;
+    public SessionManager(CookieService cookieService) {
+        this.cookieService = cookieService;
     }
 
     @Override
@@ -24,7 +22,7 @@ public class SessionManager implements HandlerInterceptor {
             return true;
         }
 
-        String sessionId = SessionService.getSessionUuidFromCookies(request);
+        String sessionId = cookieService.getSessionId(request);
 
         boolean permission = checkPermission(sessionId);
 
@@ -37,10 +35,6 @@ public class SessionManager implements HandlerInterceptor {
     }
 
     private boolean checkPermission(String sessionId) {
-        if (sessionId == null) {
-            return false;
-        }
-        Optional<CustomSession> sessionOpt = sessionService.findByUUID(sessionId);
-        return sessionOpt.isPresent();
+        return sessionId != null;
     }
 }

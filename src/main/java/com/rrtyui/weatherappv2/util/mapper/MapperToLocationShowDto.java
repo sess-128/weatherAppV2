@@ -5,9 +5,9 @@ import com.rrtyui.weatherappv2.dto.location.LocationShowDto;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MapperToLocationShowDto implements Mapper<LocationByCoordinatesJson, LocationShowDto> {
-    @Override
-    public LocationShowDto mapFrom(LocationByCoordinatesJson object) {
+public class MapperToLocationShowDto {
+
+    public static LocationShowDto mapFrom(LocationByCoordinatesJson object) {
         return LocationShowDto.builder()
                 .currentTemp(object.getCurrent().getTemp_c())
                 .feelsLike(object.getCurrent().getFeelslike_c())

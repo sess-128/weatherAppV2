@@ -14,23 +14,19 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserDao userDao;
-    private final MapperToUserSave mapperToUserSave;
-    private final MapperToUserLogin mapperToUserLogin;
 
     @Autowired
-    public UserService(UserDao userDao, MapperToUserSave mapperToUserSave, MapperToUserLogin mapperToUserLogin) {
+    public UserService(UserDao userDao) {
         this.userDao = userDao;
-        this.mapperToUserSave = mapperToUserSave;
-        this.mapperToUserLogin = mapperToUserLogin;
     }
 
     public User addUser(UserSaveDto userSaveDto) {
-        User user = mapperToUserSave.mapFrom(userSaveDto);
+        User user = MapperToUserSave.mapFrom(userSaveDto);
         return userDao.save(user);
     }
 
     public Optional<User> findByLogin(UserLoginDto userLoginDto) {
-        User user = mapperToUserLogin.mapFrom(userLoginDto);
+        User user = MapperToUserLogin.mapFrom(userLoginDto);
         return userDao.findByLogin(user);
     }
 

@@ -5,10 +5,9 @@ import com.rrtyui.weatherappv2.entity.Location;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MapperToLocation implements Mapper<LocationSaveDto, Location> {
+public class MapperToLocation {
 
-    @Override
-    public Location mapFrom(LocationSaveDto object) {
+    public static Location mapFrom(LocationSaveDto object) {
         return Location.builder()
                 .name(object.getName())
                 .latitude(object.getLatitude())

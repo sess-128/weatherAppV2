@@ -6,6 +6,7 @@ import com.rrtyui.weatherappv2.dto.user.UserSaveDto;
 import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.util.UserPasswordDecodeEncodeUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,14 @@ public class AuthService {
     private final UserService userService;
     private final SessionService sessionService;
     private final CookieService cookieService;
+    private final HttpServletRequest httpServletRequest;
 
     @Autowired
-    public AuthService(UserService userService, SessionService sessionService, CookieService cookieService) {
+    public AuthService(UserService userService, SessionService sessionService, CookieService cookieService, HttpServletRequest httpServletRequest) {
         this.userService = userService;
         this.sessionService = sessionService;
         this.cookieService = cookieService;
+        this.httpServletRequest = httpServletRequest;
     }
 
     public AuthResult authUser(UserLoginDto userLoginDto) {
@@ -55,6 +58,7 @@ public class AuthService {
     }
 
     public User getCurrentUser() {
-        return sessionService.getCurrentUser();
+        String sessionId = cookieService.getSessionId(httpServletRequest);
+        return sessionService.getCurrentUser(sessionId);
     }
 }
