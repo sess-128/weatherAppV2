@@ -1,6 +1,5 @@
 package com.rrtyui.weatherappv2.dao;
 
-import com.rrtyui.weatherappv2.exception.UserAlreadyExistException;
 import jakarta.transaction.Transactional;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -18,14 +17,11 @@ public abstract class BaseDao<T> {
 
     @Transactional
     public T save(T entity) {
-        try {
-            Session session = sessionFactory.getCurrentSession();
-            session.persist(entity);
+        Session session = sessionFactory.getCurrentSession();
+        session.persist(entity);
+        session.flush();
 
-            return entity;
-        } catch (RuntimeException e) {
-            throw new UserAlreadyExistException(e.getMessage());
-        }
+        return entity;
     }
 
     @Transactional

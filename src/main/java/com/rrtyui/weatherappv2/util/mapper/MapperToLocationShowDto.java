@@ -2,9 +2,8 @@ package com.rrtyui.weatherappv2.util.mapper;
 
 import com.rrtyui.weatherappv2.dto.location.LocationByCoordinatesJson;
 import com.rrtyui.weatherappv2.dto.location.LocationShowDto;
-import org.springframework.stereotype.Component;
 
-@Component
+
 public class MapperToLocationShowDto {
 
     public static LocationShowDto mapFrom(LocationByCoordinatesJson object) {

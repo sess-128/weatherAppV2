@@ -1,7 +1,6 @@
 package com.rrtyui.weatherappv2.dao;
 
 import com.rrtyui.weatherappv2.entity.User;
-import com.rrtyui.weatherappv2.exception.WrongCredentialsException;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import org.hibernate.SessionFactory;
@@ -16,15 +15,15 @@ public class UserDao extends BaseDao<User> {
     }
 
     @Transactional
-    public Optional<User> findByLogin(User user) {
+    public Optional<User> findByName(User user) {
         try {
             User foundUser = (User) sessionFactory.getCurrentSession()
-                    .createQuery("FROM User WHERE name = :login")
-                    .setParameter("login", user.getName())
+                    .createQuery("FROM User WHERE name = :name")
+                    .setParameter("name", user.getName())
                     .getSingleResult();
-            return Optional.ofNullable(foundUser);
+            return Optional.of(foundUser);
         } catch (NoResultException e) {
-            throw new WrongCredentialsException(e);
+            return Optional.empty();
         }
     }
 }

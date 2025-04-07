@@ -4,6 +4,7 @@ import com.rrtyui.weatherappv2.dao.UserDao;
 import com.rrtyui.weatherappv2.dto.user.UserLoginDto;
 import com.rrtyui.weatherappv2.dto.user.UserSaveDto;
 import com.rrtyui.weatherappv2.entity.User;
+import com.rrtyui.weatherappv2.exception.UserAlreadyExistException;
 import com.rrtyui.weatherappv2.util.mapper.MapperToUserLogin;
 import com.rrtyui.weatherappv2.util.mapper.MapperToUserSave;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +23,14 @@ public class UserService {
 
     public User addUser(UserSaveDto userSaveDto) {
         User user = MapperToUserSave.mapFrom(userSaveDto);
+        if (userDao.findByName(user).isPresent()) {
+            throw new UserAlreadyExistException();
+        }
         return userDao.save(user);
     }
 
     public Optional<User> findByLogin(UserLoginDto userLoginDto) {
         User user = MapperToUserLogin.mapFrom(userLoginDto);
-        return userDao.findByLogin(user);
+        return userDao.findByName(user);
     }
-
 }

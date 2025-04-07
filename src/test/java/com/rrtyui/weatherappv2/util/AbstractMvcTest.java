@@ -14,8 +14,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-        SpringConfig.class,  // ваш основной конфиг MVC
-        TestConfig.class    // тестовый конфиг
+        SpringConfig.class,
+        TestConfig.class
 })
 @WebAppConfiguration
 public abstract class AbstractMvcTest {

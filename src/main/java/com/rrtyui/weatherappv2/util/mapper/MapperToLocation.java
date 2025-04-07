@@ -2,9 +2,8 @@ package com.rrtyui.weatherappv2.util.mapper;
 
 import com.rrtyui.weatherappv2.dto.location.LocationSaveDto;
 import com.rrtyui.weatherappv2.entity.Location;
-import org.springframework.stereotype.Component;
 
-@Component
+
 public class MapperToLocation {
 
     public static Location mapFrom(LocationSaveDto object) {

@@ -15,15 +15,13 @@ import java.util.Optional;
 @Service
 public class SessionService {
     private final CustomSessionDao customSessionDao;
-    private final CookieService cookieService;
 
     @Autowired
-    public SessionService(CustomSessionDao customSessionDao, CookieService cookieService) {
+    public SessionService(CustomSessionDao customSessionDao) {
         this.customSessionDao = customSessionDao;
-        this.cookieService = cookieService;
     }
 
-    public CustomSession add(User user) {
+    public CustomSession addCustomSession(User user) {
         CustomSession customSession = MapperToCustomSession.mapFrom(user);
         return customSessionDao.save(customSession);
     }
@@ -36,12 +34,12 @@ public class SessionService {
         return customSession.get().getUser();
     }
 
-    public Optional<CustomSession> findByUUID(String uuid) {
+    private Optional<CustomSession> findByUUID(String uuid) {
         deleteInvalidSessions();
         return customSessionDao.findById(uuid);
     }
 
-    public void deleteInvalidSessions() {
+    private void deleteInvalidSessions() {
         List<CustomSession> customSessions = customSessionDao.findAll();
         for (CustomSession customSession : customSessions) {
             if (isValidTimeEnded(customSession.getExpiresAt())) {
@@ -55,3 +53,4 @@ public class SessionService {
         return LocalDateTime.now().isAfter(timeToCheck);
     }
 }
+//TODO: Сессии не добавляются вновь при логине

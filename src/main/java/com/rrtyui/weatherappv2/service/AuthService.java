@@ -5,7 +5,7 @@ import com.rrtyui.weatherappv2.dto.user.UserLoginDto;
 import com.rrtyui.weatherappv2.dto.user.UserSaveDto;
 import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
-import com.rrtyui.weatherappv2.util.UserPasswordDecodeEncodeUtil;
+import com.rrtyui.weatherappv2.util.PasswordEncoder;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,11 +37,11 @@ public class AuthService {
 
         User user = savedUserOpt.get();
 
-        if (!UserPasswordDecodeEncodeUtil.isCorrectPassword(userLoginDto.getPassword(), user.getPassword())) {
+        if (!PasswordEncoder.isCorrectPassword(userLoginDto.getPassword(), user.getPassword())) {
             return AuthResult.failure(WRONG_CREDENTIALS);
         }
 
-        CustomSession customSession = sessionService.add(user);
+        CustomSession customSession = sessionService.addCustomSession(user);
         cookieService.addSessionToCookie(customSession);
 
         return AuthResult.complete();
@@ -49,7 +49,7 @@ public class AuthService {
 
     public void saveUser(UserSaveDto userSaveDto) {
         User user = userService.addUser(userSaveDto);
-        CustomSession customSession = sessionService.add(user);
+        CustomSession customSession = sessionService.addCustomSession(user);
         cookieService.addSessionToCookie(customSession);
     }
 

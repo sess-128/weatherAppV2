@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CookieService {
+    private static final String COOKIE_NAME = "session_id";
     private final HttpServletRequest httpServletRequest;
     private final HttpServletResponse httpServletResponse;
 
@@ -19,7 +20,7 @@ public class CookieService {
     }
 
     public void addSessionToCookie(CustomSession customSession) {
-        Cookie cookie = new Cookie("session_id", customSession.getId().toString());
+        Cookie cookie = new Cookie(COOKIE_NAME, customSession.getId().toString());
         cookie.setMaxAge(60 * 60);
         httpServletResponse.addCookie(cookie);
     }
@@ -27,7 +28,7 @@ public class CookieService {
     public void delete() {
         Cookie[] cookies = httpServletRequest.getCookies();
         for (Cookie cookie : cookies) {
-            if ("session_id".equals(cookie.getName())) {
+            if (COOKIE_NAME.equals(cookie.getName())) {
                 cookie.setMaxAge(0);
                 httpServletResponse.addCookie(cookie);
             }
@@ -38,7 +39,7 @@ public class CookieService {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("session_id".equals(cookie.getName())) {
+                if (COOKIE_NAME.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
