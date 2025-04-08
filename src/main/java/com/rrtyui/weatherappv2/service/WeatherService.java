@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -37,18 +38,25 @@ public class WeatherService {
         this.objectMapper = objectMapper;
     }
 
-    public List<LocationSearchDto> findAll(LocationNameDto LocationNameDto) {
+    public List<LocationSearchDto> findAll(LocationNameDto locationNameDto) {
         String url = UriComponentsBuilder
                 .fromHttpUrl("http://api.weatherapi.com/v1/search.json")
-                .queryParam("q", LocationNameDto.getCity())
+                .queryParam("q", locationNameDto.getCity())
                 .queryParam("key", API_KEY)
                 .toUriString();
 
-        ResponseEntity<LocationSearchDto[]> response = restTemplate.getForEntity(url, LocationSearchDto[].class);
+        try {
+            ResponseEntity<LocationSearchDto[]> response = restTemplate.getForEntity(url, LocationSearchDto[].class);
 
-        LocationSearchDto[] body = response.getBody();
+            LocationSearchDto[] body = response.getBody();
 
-        return List.of(body);
+            if (body == null) {
+                return List.of();
+            }
+            return List.of(body);
+        } catch (RestClientException e) {
+            throw new ThirdPartyServiceException(e);
+        }
     }
 
     public List<LocationShowDto> getLocationsForShow(User user) {
@@ -61,7 +69,6 @@ public class WeatherService {
                 .queryParam("key", API_KEY)
                 .queryParam("q", TO_REPLACE)
                 .toUriString();
-
 
         fillLocationsForShow(locationsForUser, url, locationForShow);
 
