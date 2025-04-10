@@ -23,7 +23,7 @@ public class LocationDao extends BaseDao<Location> {
     }
 
     @Transactional
-    public void delete(User user, String city) {
+    public void deleteLocationForUser(User user, String city) {
         sessionFactory.getCurrentSession()
                 .createQuery("DELETE FROM Location WHERE user = :user AND name = :city")
                 .setParameter("user", user)

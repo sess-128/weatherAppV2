@@ -6,7 +6,7 @@ import com.rrtyui.weatherappv2.dto.user.UserSaveDto;
 import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.util.PasswordEncoder;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +18,14 @@ public class AuthService {
     private final UserService userService;
     private final SessionService sessionService;
     private final CookieService cookieService;
-    private final HttpServletRequest httpServletRequest;
 
     @Autowired
-    public AuthService(UserService userService, SessionService sessionService, CookieService cookieService, HttpServletRequest httpServletRequest) {
+    public AuthService(UserService userService, SessionService sessionService, CookieService cookieService) {
         this.userService = userService;
         this.sessionService = sessionService;
         this.cookieService = cookieService;
-        this.httpServletRequest = httpServletRequest;
     }
+
 
     public AuthResult authUser(UserLoginDto userLoginDto) {
         Optional<User> savedUserOpt = userService.findByLogin(userLoginDto);
@@ -41,24 +40,26 @@ public class AuthService {
             return AuthResult.failure(WRONG_CREDENTIALS);
         }
 
-        CustomSession customSession = sessionService.addCustomSession(user);
+        CustomSession customSession = sessionService.saveSessionToUser(user);
         cookieService.addSessionToCookie(customSession);
 
         return AuthResult.complete();
     }
 
+
     public void saveUser(UserSaveDto userSaveDto) {
         User user = userService.addUser(userSaveDto);
-        CustomSession customSession = sessionService.addCustomSession(user);
+        CustomSession customSession = sessionService.saveSessionToUser(user);
         cookieService.addSessionToCookie(customSession);
     }
 
     public void logout() {
-        cookieService.delete();
+        cookieService.deleteCookieForSession();
     }
 
+
     public User getCurrentUser() {
-        String sessionId = cookieService.getSessionId(httpServletRequest);
-        return sessionService.getCurrentUser(sessionId);
+        String sessionId = cookieService.getSessionId();
+        return sessionService.getUserBySessionId(sessionId);
     }
 }

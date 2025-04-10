@@ -3,17 +3,24 @@ package com.rrtyui.weatherappv2.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rrtyui.weatherappv2.interceptor.SessionManager;
 import com.rrtyui.weatherappv2.service.CookieService;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.*;
 import org.thymeleaf.spring6.SpringTemplateEngine;
-import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableWebMvc
@@ -22,17 +29,18 @@ public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
 
     @Autowired
-    public SpringConfig(ApplicationContext applicationContext) {
+    public SpringConfig(ApplicationContext applicationContext, ConfigurableEnvironment environment) {
         this.applicationContext = applicationContext;
     }
 
     @Bean
-    public SpringResourceTemplateResolver templateResolver() {
-        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-        templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setPrefix("/WEB-INF/views/");
+    public ClassLoaderTemplateResolver templateResolver() {
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setPrefix("templates/");
         templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode("HTML");
         templateResolver.setCharacterEncoding("UTF-8");
+        templateResolver.setCacheable(false);
         return templateResolver;
     }
 
@@ -91,13 +99,13 @@ public class SpringConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/resources/**")
-                .addResourceLocations("/resources/");
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/");
 
         registry.addResourceHandler("/css/**")
-                .addResourceLocations("/resources/css/");
+                .addResourceLocations("classpath:/static/css/");
 
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("/resources/images/");
+                .addResourceLocations("classpath:/static/images/");
     }
 }

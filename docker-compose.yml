@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  flyway:
+    image: flyway/flyway:latest
+    container_name: flyway
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./db/migration:/flyway/sql
+    command:
+      - -url=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - -user=${POSTGRES_USER}
+      - -password=${POSTGRES_PASSWORD}
+      - -baselineOnMigrate=true
+      - migrate
+
+  tomcat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tomcat
+    depends_on:
+      - flyway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_THYMELEAF_PREFIX=classpath:/templates/
+      - SPRING_THYMELEAF_CACHE=false
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - tomcat
+
+volumes:
+  pgdata:

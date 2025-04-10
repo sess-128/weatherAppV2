@@ -15,12 +15,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.thymeleaf.spring6.SpringTemplateEngine;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -73,7 +70,7 @@ public class TestConfig {
     private Properties hibernateProperties() {
         Properties props = new Properties();
         props.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-        props.put("hibernate.hbm2ddl.auto", "create-drop"); // создаёт схему перед каждым тестом
+        props.put("hibernate.hbm2ddl.auto", "create-drop");
         props.put("hibernate.show_sql", true);
         return props;
     }
@@ -82,21 +79,6 @@ public class TestConfig {
     public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) {
         return new HibernateTransactionManager(sessionFactory);
     }
-
-//    @Bean
-//    @Primary
-//    public ITemplateResolver templateResolver() {
-//        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
-//        resolver.setPrefix("templates/");
-//        resolver.setSuffix(".html");
-//        return resolver;
-//    }
-//
-//    @Bean
-//    @Primary
-//    public SpringTemplateEngine templateEngine() {
-//        return Mockito.mock(SpringTemplateEngine.class);
-//    }
 
     @Bean
     @Primary
@@ -110,13 +92,5 @@ public class TestConfig {
     @Primary
     public ServletContext servletContext() {
         return new MockServletContext();
-    }
-    @Bean
-    @Primary
-    public ViewResolver viewResolver() {
-        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-        resolver.setPrefix("/WEB-INF/views/");
-        resolver.setSuffix(".html");
-        return resolver;
     }
 }

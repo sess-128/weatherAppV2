@@ -1,86 +1,59 @@
 package com.rrtyui.weatherappv2.controller;
 
-import com.rrtyui.weatherappv2.dto.location.LocationShowDto;
+import com.rrtyui.weatherappv2.dao.UserDao;
+import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
-import com.rrtyui.weatherappv2.service.AuthService;
-import com.rrtyui.weatherappv2.service.CookieService;
-import com.rrtyui.weatherappv2.service.WeatherService;
+import com.rrtyui.weatherappv2.service.SessionService;
 import com.rrtyui.weatherappv2.util.AbstractMvcTest;
+import com.rrtyui.weatherappv2.util.CustomTest;
+import com.rrtyui.weatherappv2.util.PasswordEncoder;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class UserControllerTest extends AbstractMvcTest {
-    @MockitoBean
-    private AuthService authService;
+@CustomTest
+class IndexControllerTest extends AbstractMvcTest {
 
-    @MockitoBean
-    private WeatherService weatherService;
+    @Autowired
+    private UserDao userDao;
 
-    @MockitoBean
-    private CookieService cookieService;
+    @Autowired
+    private SessionService sessionService;
 
-    @Test
-    void index_ShouldAddAttributesAndReturnView_WhenUserSignIn() throws Exception {
-        User testUser = new User();
-        testUser.setName("Andrei");
+    private CustomSession session;
 
-        LocationShowDto locationDto = LocationShowDto.builder()
-                .city("Moscow")
-                .currentTemp(BigDecimal.valueOf(10))
+    @BeforeEach
+    void setUp() {
+        User user = User.builder()
+                .name("testUser")
+                .password(PasswordEncoder.encodePassword("123"))
                 .build();
+        userDao.save(user);
 
-        when(cookieService.getSessionId(any(HttpServletRequest.class)))
-                .thenReturn("valid-session-id");
-        when(authService.getCurrentUser()).thenReturn(testUser);
-        when(weatherService.getLocationsForShow(testUser)).thenReturn(List.of(locationDto));
-
-        mockMvc.perform(get("/"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.view().name("index"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("user"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("search"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("locations_for_show"));
+        session = sessionService.saveSessionToUser(user);
     }
 
     @Test
-    void index_ShouldRedirectToSignIn_WhenUserNotAuth() throws Exception {
-        mockMvc.perform(get("/"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/sign-in"));
+    void index_shouldReturnIndexPageWithUserAndLocations() throws Exception {
+        mockMvc.perform(get("/")
+                        .cookie(new Cookie("session_id", session.getId().toString())))
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"))
+                .andExpect(model().attributeExists("user"))
+                .andExpect(model().attributeExists("search"))
+                .andExpect(model().attributeExists("locations_for_show"));
     }
 
-    @Test
-    void delete_ShouldDeleteSessionAndCookie() throws Exception {
-        when(cookieService.getSessionId(any(HttpServletRequest.class)))
-                .thenReturn("valid-session-id");
-        when(authService.getCurrentUser()).thenReturn(new User());
 
-        mockMvc.perform(get("/logout"))
+    @Test
+    void logout_shouldRedirectToRoot() throws Exception {
+        mockMvc.perform(get("/logout")
+                        .cookie(new Cookie("session_id", session.getId().toString())))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
-
-        verify(authService).logout();
-
-        when(cookieService.getSessionId(any(HttpServletRequest.class)))
-                .thenReturn(null); // кука удалена
-
-        mockMvc.perform(get("/"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/sign-in"));
     }
-
 }

@@ -25,7 +25,7 @@ public class CookieService {
         httpServletResponse.addCookie(cookie);
     }
 
-    public void delete() {
+    public void deleteCookieForSession() {
         Cookie[] cookies = httpServletRequest.getCookies();
         for (Cookie cookie : cookies) {
             if (COOKIE_NAME.equals(cookie.getName())) {
@@ -35,8 +35,8 @@ public class CookieService {
         }
     }
 
-    public String getSessionId(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
+    public String getSessionId() {
+        Cookie[] cookies = httpServletRequest.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (COOKIE_NAME.equals(cookie.getName())) {

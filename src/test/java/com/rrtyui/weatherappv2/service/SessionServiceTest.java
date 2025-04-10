@@ -1,29 +1,21 @@
 package com.rrtyui.weatherappv2.service;
 
-import com.rrtyui.weatherappv2.dao.CustomSessionDao;
 import com.rrtyui.weatherappv2.dao.UserDao;
 import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.exception.InvalidSessionException;
-import com.rrtyui.weatherappv2.util.CustomServiceTest;
-import com.rrtyui.weatherappv2.util.mapper.MapperToCustomSession;
+import com.rrtyui.weatherappv2.util.CustomTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@CustomServiceTest
+@CustomTest
 class SessionServiceTest {
 
     @Autowired
@@ -48,8 +40,8 @@ class SessionServiceTest {
     }
 
     @Test
-    void addCustomSession_ShouldSaveAndReturnCustomSession_WhenUserExist() {
-        CustomSession customSession = sessionService.addCustomSession(testUser);
+    void saveSession_ToUser_WhenUserExist() {
+        CustomSession customSession = sessionService.saveSessionToUser(testUser);
 
         assertNotNull(customSession);
         assertEquals(testUser, customSession.getUser());
@@ -63,21 +55,21 @@ class SessionServiceTest {
     }
 
     @Test
-    void getCurrentUser_ShouldReturnUser_WhenSessionIdExist() {
-        CustomSession customSession = sessionService.addCustomSession(testUser);
+    void getUser_ShouldReturnUser_BySessionId_WhenSessionIdExist() {
+        CustomSession customSession = sessionService.saveSessionToUser(testUser);
         String sessionUuid = customSession.getId().toString();
-        when(cookieService.getSessionId(any())).thenReturn(sessionUuid);
+        when(cookieService.getSessionId()).thenReturn(sessionUuid);
 
-        User user = sessionService.getCurrentUser(sessionUuid);
+        User user = sessionService.getUserBySessionId(sessionUuid);
 
         assertNotNull(user);
         assertEquals(user, testUser);
     }
 
     @Test
-    void getCurrentUser_ShouldThrowException_WhenSessionDoesntExist() {
+    void getUser_BySessionId_ShouldThrowException_WhenSessionDoesntExist() {
         String uuid = UUID.randomUUID().toString();
 
-        assertThrows(InvalidSessionException.class, () -> sessionService.getCurrentUser(uuid));
+        assertThrows(InvalidSessionException.class, () -> sessionService.getUserBySessionId(uuid));
     }
 }

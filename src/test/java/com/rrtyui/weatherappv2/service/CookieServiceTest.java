@@ -9,9 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,12 +46,12 @@ class CookieServiceTest {
     }
 
     @Test
-    void delete_ShouldSetCookieMaxAgeToZero_WhenSessionCookieExists() {
+    void delete_CookieForSession_ShouldSetCookieMaxAgeToZero_WhenSessionCookieExists() {
         Cookie testCookie = new Cookie(COOKIE_NAME, "test");
         Cookie[] cookies = {testCookie};
         when(request.getCookies()).thenReturn(cookies);
 
-        cookieService.delete();
+        cookieService.deleteCookieForSession();
 
         verify(response).addCookie(argThat(cookie ->
                     COOKIE_NAME.equals(cookie.getName()) &&
@@ -66,7 +65,7 @@ class CookieServiceTest {
         Cookie[] cookies = {testCookie};
         when(request.getCookies()).thenReturn(cookies);
 
-        String sessionId = cookieService.getSessionId(request);
+        String sessionId = cookieService.getSessionId();
 
         assertEquals(sessionId, testCookie.getValue());
     }
@@ -77,7 +76,7 @@ class CookieServiceTest {
         Cookie[] cookies = {testCookie};
         when(request.getCookies()).thenReturn(cookies);
 
-        String sessionId = cookieService.getSessionId(request);
+        String sessionId = cookieService.getSessionId();
 
         assertNull(sessionId);
     }

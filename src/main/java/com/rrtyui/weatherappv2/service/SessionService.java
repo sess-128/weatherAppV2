@@ -5,6 +5,7 @@ import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.exception.InvalidSessionException;
 import com.rrtyui.weatherappv2.util.mapper.MapperToCustomSession;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +22,13 @@ public class SessionService {
         this.customSessionDao = customSessionDao;
     }
 
-    public CustomSession addCustomSession(User user) {
+
+    public CustomSession saveSessionToUser(User user) {
         CustomSession customSession = MapperToCustomSession.mapFrom(user);
         return customSessionDao.save(customSession);
     }
 
-    public User getCurrentUser(String sessionUuid) {
+    public User getUserBySessionId(String sessionUuid) {
         Optional<CustomSession> customSession = findByUUID(sessionUuid);
         if (customSession.isEmpty()) {
             throw new InvalidSessionException("Invalid session: sign in / sign up");
@@ -53,4 +55,3 @@ public class SessionService {
         return LocalDateTime.now().isAfter(timeToCheck);
     }
 }
-//TODO: Сессии не добавляются вновь при логине

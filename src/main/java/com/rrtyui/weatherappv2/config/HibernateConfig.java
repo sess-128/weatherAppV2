@@ -14,7 +14,6 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@PropertySource("classpath:application.properties")
 @EnableTransactionManagement
 public class HibernateConfig {
 
@@ -25,39 +24,35 @@ public class HibernateConfig {
     }
 
     @Bean
-    public LocalSessionFactoryBean sessionFactory() {
-        LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
-        sessionFactoryBean.setDataSource(dataSource());
-        sessionFactoryBean.setPackagesToScan("com.rrtyui.weatherappv2");
-        sessionFactoryBean.setHibernateProperties(properties());
-
-        return sessionFactoryBean;
-    }
-
-    @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(environment.getRequiredProperty("datasource.driver"));
-        dataSource.setUrl(environment.getRequiredProperty("datasource.url"));
-        dataSource.setUsername(environment.getRequiredProperty("datasource.user"));
-        dataSource.setPassword(environment.getRequiredProperty("datasource.password"));
+        dataSource.setDriverClassName(environment.getRequiredProperty("DATASOURCE_DRIVER"));
+        dataSource.setUrl(environment.getRequiredProperty("DATASOURCE_URL"));
+        dataSource.setUsername(environment.getRequiredProperty("DATASOURCE_USER"));
+        dataSource.setPassword(environment.getRequiredProperty("DATASOURCE_PASSWORD"));
 
         return dataSource;
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager() {
-        HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager();
-        hibernateTransactionManager.setSessionFactory(sessionFactory().getObject());
-
-        return hibernateTransactionManager;
+    public LocalSessionFactoryBean sessionFactory() {
+        LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
+        factoryBean.setDataSource(dataSource());
+        factoryBean.setPackagesToScan("com.rrtyui.weatherappv2");
+        factoryBean.setHibernateProperties(hibernateProperties());
+        return factoryBean;
     }
 
-    private Properties properties() {
-        Properties properties = new Properties();
-        properties.setProperty("hibernate.dialect", environment.getProperty("hibernate.dialect"));
-        properties.setProperty("hibernate.hbm2ddl.auto", environment.getProperty("hibernate.hbm2ddl.auto"));
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        return new HibernateTransactionManager(sessionFactory().getObject());
+    }
 
-        return properties;
+    private Properties hibernateProperties() {
+        Properties props = new Properties();
+        props.setProperty("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
+        props.setProperty("hibernate.hbm2ddl.auto", environment.getRequiredProperty("hibernate.hbm2ddl.auto"));
+        return props;
     }
 }
+

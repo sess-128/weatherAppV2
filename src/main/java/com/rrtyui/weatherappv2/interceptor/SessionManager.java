@@ -22,7 +22,7 @@ public class SessionManager implements HandlerInterceptor {
             return true;
         }
 
-        String sessionId = cookieService.getSessionId(request);
+        String sessionId = cookieService.getSessionId();
 
         boolean permission = checkPermission(sessionId);
 

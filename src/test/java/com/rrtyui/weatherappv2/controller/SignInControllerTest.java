@@ -1,29 +1,21 @@
 package com.rrtyui.weatherappv2.controller;
 
 import com.rrtyui.weatherappv2.dao.UserDao;
-import com.rrtyui.weatherappv2.dto.user.AuthResult;
-import com.rrtyui.weatherappv2.dto.user.UserLoginDto;
 import com.rrtyui.weatherappv2.entity.User;
-import com.rrtyui.weatherappv2.service.AuthService;
-import com.rrtyui.weatherappv2.service.WeatherService;
 import com.rrtyui.weatherappv2.util.AbstractMvcTest;
-import com.rrtyui.weatherappv2.util.CustomServiceTest;
+import com.rrtyui.weatherappv2.util.CustomTest;
 import com.rrtyui.weatherappv2.util.PasswordEncoder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@CustomServiceTest
+@CustomTest
 class SignInControllerTest extends AbstractMvcTest {
 
     @Autowired
@@ -32,8 +24,8 @@ class SignInControllerTest extends AbstractMvcTest {
     @BeforeEach
     void setUp() {
         User user = User.builder()
-                .name("test2")
-                .password(PasswordEncoder.encodePassword("123"))
+                .name("testUser")
+                .password(PasswordEncoder.encodePassword("password"))
                 .build();
         userDao.save(user);
     }
@@ -50,10 +42,40 @@ class SignInControllerTest extends AbstractMvcTest {
     @Test
     void signIn_ShouldRedirectToHome_WhenCredentialsValid() throws Exception {
         mockMvc.perform(post("/sign-in")
-                        .param("name", "test2")
-                        .param("password", "123"))
+                        .param("name", "testUser")
+                        .param("password", "password"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }
 
+    @Test
+    void signIn_ShouldReturnBackToSignIn_WhenPasswordWrong() throws Exception {
+        mockMvc.perform(post("/sign-in")
+                        .param("name", "testUser")
+                        .param("password", "wrongPassword"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("sign-in"))
+                .andExpect(model().attributeExists("wrongCredentials"));
+    }
+
+    @Test
+    void signIn_ShouldReturnBackToSignIn_WhenLoginWrong() throws Exception {
+        mockMvc.perform(post("/sign-in")
+                        .param("name", "user")
+                        .param("password", "password"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("sign-in"))
+                .andExpect(model().attributeExists("wrongCredentials"));
+    }
+
+    @Test
+    void signIn_shouldReturnBackToSignUp_whenValidationFails() throws Exception {
+        mockMvc.perform(post("/sign-in")
+                        .param("name", "")
+                        .param("password", ""))
+                .andExpect(status().isOk())
+                .andExpect(view().name("sign-in"))
+                .andExpect(model().attributeExists("valid"))
+                .andExpect(model().attributeHasFieldErrors("user", "name", "password"));
+    }
 }

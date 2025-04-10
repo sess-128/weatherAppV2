@@ -4,7 +4,7 @@ import com.rrtyui.weatherappv2.dto.user.UserLoginDto;
 import com.rrtyui.weatherappv2.dto.user.UserSaveDto;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.exception.UserAlreadyExistException;
-import com.rrtyui.weatherappv2.util.CustomServiceTest;
+import com.rrtyui.weatherappv2.util.CustomTest;
 import com.rrtyui.weatherappv2.util.PasswordEncoder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@CustomServiceTest
+@CustomTest
 class UserServiceIT {
     @Autowired
     private UserService userService;

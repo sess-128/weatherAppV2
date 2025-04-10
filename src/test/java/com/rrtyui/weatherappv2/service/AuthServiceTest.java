@@ -6,7 +6,7 @@ import com.rrtyui.weatherappv2.dto.user.UserSaveDto;
 import com.rrtyui.weatherappv2.entity.CustomSession;
 import com.rrtyui.weatherappv2.entity.User;
 import com.rrtyui.weatherappv2.exception.InvalidSessionException;
-import com.rrtyui.weatherappv2.util.CustomServiceTest;
+import com.rrtyui.weatherappv2.util.CustomTest;
 import com.rrtyui.weatherappv2.util.PasswordEncoder;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@CustomServiceTest
+@CustomTest
 class AuthServiceTest {
 
     @Mock
@@ -65,7 +65,7 @@ class AuthServiceTest {
     void authUser_ShouldReturnSuccess_WhenCredentialsAreCorrect() {
         try (MockedStatic<PasswordEncoder> mockedPasswordEncoder = Mockito.mockStatic(PasswordEncoder.class)) {
             when(userService.findByLogin(userLoginDto)).thenReturn(Optional.of(testUser));
-            when(sessionService.addCustomSession(testUser)).thenReturn(new CustomSession());
+            when(sessionService.saveSessionToUser(testUser)).thenReturn(new CustomSession());
 
             mockedPasswordEncoder.when(() -> PasswordEncoder.isCorrectPassword(userLoginDto.getPassword(), testUser.getPassword())).thenReturn(true);
 
@@ -80,7 +80,7 @@ class AuthServiceTest {
     void authUser_ShouldReturnFailure_WhenCredentialsAreIncorrect() {
         try (MockedStatic<PasswordEncoder> mockedPasswordEncoder = Mockito.mockStatic(PasswordEncoder.class)) {
             when(userService.findByLogin(userLoginDto)).thenReturn(Optional.of(testUser));
-            when(sessionService.addCustomSession(testUser)).thenReturn(new CustomSession());
+            when(sessionService.saveSessionToUser(testUser)).thenReturn(new CustomSession());
 
             mockedPasswordEncoder.when(() -> PasswordEncoder.isCorrectPassword(userLoginDto.getPassword(), testUser.getPassword())).thenReturn(false);
 
@@ -94,11 +94,11 @@ class AuthServiceTest {
     @Test
     void saveUser_ShouldCreateUserAndSessionAndCookie_WhenUserIsSaved() {
         when(userService.addUser(userSaveDto)).thenReturn(testUser);
-        when(sessionService.addCustomSession(testUser)).thenReturn(new CustomSession());
+        when(sessionService.saveSessionToUser(testUser)).thenReturn(new CustomSession());
 
         authService.saveUser(userSaveDto);
 
-        verify(sessionService).addCustomSession(testUser);
+        verify(sessionService).saveSessionToUser(testUser);
         verify(cookieService).addSessionToCookie(any(CustomSession.class));
     }
 
@@ -106,16 +106,16 @@ class AuthServiceTest {
     void logout_ShouldDeleteCookie() {
         authService.logout();
 
-        verify(cookieService).delete();
+        verify(cookieService).deleteCookieForSession();
     }
 
     @Test
     void getCurrentUser_ShouldReturnUser_WhenSessionIsValid() {
         String sessionId = "validSessionId";
-        when(cookieService.getSessionId(httpServletRequest)).thenReturn(sessionId);
+        when(cookieService.getSessionId()).thenReturn(sessionId);
         CustomSession customSession = new CustomSession();
         customSession.setUser(testUser);
-        when(sessionService.getCurrentUser(sessionId)).thenReturn(testUser);
+        when(sessionService.getUserBySessionId(sessionId)).thenReturn(testUser);
 
         User currentUser = authService.getCurrentUser();
 
@@ -126,8 +126,8 @@ class AuthServiceTest {
     @Test
     void getCurrentUser_ShouldThrowException_WhenSessionIsInvalid() {
         String sessionId = "invalidSessionId";
-        when(cookieService.getSessionId(httpServletRequest)).thenReturn(sessionId);
-        when(sessionService.getCurrentUser(sessionId)).thenThrow(new InvalidSessionException("Invalid session"));
+        when(cookieService.getSessionId()).thenReturn(sessionId);
+        when(sessionService.getUserBySessionId(sessionId)).thenThrow(new InvalidSessionException("Invalid session"));
 
         assertThrows(InvalidSessionException.class, () -> authService.getCurrentUser());
     }

@@ -7,8 +7,7 @@ public class PasswordEncoder {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-    public static boolean isCorrectPassword(String source, String target) {
-        String encodePassword = encodePassword(source);
-        return !BCrypt.checkpw(encodePassword, target);
+    public static boolean isCorrectPassword(String rawPassword, String hashedPassword) {
+        return BCrypt.checkpw(rawPassword, hashedPassword);
     }
 }

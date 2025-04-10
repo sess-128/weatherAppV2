@@ -1,6 +1,5 @@
 package com.rrtyui.weatherappv2.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.rrtyui.weatherappv2.dao.LocationDao;
 import com.rrtyui.weatherappv2.dao.UserDao;
 import com.rrtyui.weatherappv2.dto.location.LocationNameDto;
@@ -9,26 +8,22 @@ import com.rrtyui.weatherappv2.dto.location.LocationSearchDto;
 import com.rrtyui.weatherappv2.dto.location.LocationShowDto;
 import com.rrtyui.weatherappv2.entity.Location;
 import com.rrtyui.weatherappv2.entity.User;
-import com.rrtyui.weatherappv2.util.CustomServiceTest;
-import com.rrtyui.weatherappv2.util.mapper.MapperToLocation;
+import com.rrtyui.weatherappv2.util.CustomTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@CustomServiceTest
+@CustomTest
 class WeatherServiceTest {
 
     @Autowired

@@ -27,5 +27,5 @@ import java.lang.annotation.Target;
         initializers = MockServletContextInitializer.class
 )
 @Transactional
-public @interface CustomServiceTest {
+public @interface CustomTest {
 }

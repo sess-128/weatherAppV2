@@ -98,6 +98,6 @@ public class WeatherService {
     }
 
     public void deleteLocation(User user, String city) {
-        locationDao.delete(user, city);
+        locationDao.deleteLocationForUser(user, city);
     }
 }
