@@ -7,6 +7,7 @@ mvnw
 mvnw.cmd
 .git/
 
+.init.sql
 .env
 !db/
 !src/
